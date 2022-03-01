@@ -57,12 +57,17 @@ local function run(cmd, args, process)
   vim.loop.read_start(stderr, on_read)
 end
 
+local function real_path(path)
+  local ret, _ = path:gsub('^~', vim.env.HOME)
+  return ret
+end
+
 function M.rg(pattern, dir)
-  run('rg', { '--regexp', pattern, dir or '.', '--vimgrep', '--smart-case' })
+  run('rg', { '--regexp', pattern, real_path(dir or '.'), '--vimgrep', '--smart-case' })
 end
 
 function M.fd(pattern, dir)
-  run('fd', { '--regex', pattern, '--type', 'file', '--search-path', dir or '.' }, function(line)
+  run('fd', { '--regex', pattern, '--type', 'file', '--search-path', real_path(dir or '.') }, function(line)
     return line .. ':1: ' -- line .. line:gsub('^.*/', '')
   end)
 end
