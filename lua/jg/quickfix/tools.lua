@@ -58,8 +58,9 @@ local function run(cmd, args, process)
 end
 
 local function real_path(path)
-  local ret, _ = path:gsub('^~', vim.env.HOME)
-  return ret
+  path, _ = path:gsub('^~', vim.env.HOME)
+
+  return path
 end
 
 function M.rg(pattern, dir)

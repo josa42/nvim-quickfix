@@ -7,7 +7,8 @@ local function pad_right(str, len)
 end
 
 local function format_fname(fname, limit)
-  -- char in fname may occur more than 1 width, ignore this issue in order to keep performance
+  -- char in fname may occur more than 1 width, ignore this issue in order to
+  -- keep performance
   if #fname <= limit then
     return pad_right(fname, limit)
   end
@@ -22,7 +23,10 @@ local function buf_fname(bufnr)
       return '[No Name]'
     end
 
-    return fname:gsub('^' .. vim.env.HOME, '~')
+    fname, _ = fname:gsub('^' .. vim.env.HOME .. '/', '~/')
+    fname, _ = fname:gsub('^%./', '')
+
+    return fname
   end
 
   return ''
