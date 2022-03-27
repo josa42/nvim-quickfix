@@ -18,6 +18,13 @@ local function format_pos(lnum, lnum_len, col, col_len)
   return ('%' .. lnum_len .. 'd:%-' .. col_len .. 'd'):format(lnum, col)
 end
 
+local function escape(str)
+  str, _ = str:gsub('%-', '%%-')
+  str, _ = str:gsub('%.', '%%.')
+
+  return str
+end
+
 local function buf_fname(bufnr)
   if bufnr > 0 then
     local fname = vim.fn.bufname(bufnr)
@@ -25,7 +32,11 @@ local function buf_fname(bufnr)
       return '[No Name]'
     end
 
-    fname, _ = fname:gsub('^' .. vim.env.HOME .. '/', '~/')
+    local home = escape(vim.env.HOME .. '/')
+    local pwd = escape(vim.fn.getcwd(0):gsub('^' .. home, '~/'))
+
+    fname, _ = fname:gsub('^' .. home, '~/')
+    fname, _ = fname:gsub('^' .. pwd, '')
     fname, _ = fname:gsub('^%./', '')
 
     return fname
