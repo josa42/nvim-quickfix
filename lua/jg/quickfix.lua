@@ -3,6 +3,10 @@ local M = {}
 local fname_len_default = 96
 
 local function format_fname(fname, len)
+  if fname:find('^fugitive') ~= nil then
+    return fname:match('[^/]+$'):sub(1, 7)
+  end
+
   if vim.fn.strchars(fname) <= len then
     return vim.fn.strcharpart(fname .. string.rep(' ', len), 0, len)
   end
