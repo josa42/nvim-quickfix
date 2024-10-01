@@ -1,1 +1,1 @@
-vim.o.qftf = '{info -> v:lua.require("jg.quickfix").format(info)}'
+vim.o.qftf = '{info -> v:lua.require("quickfix").format(info)}'

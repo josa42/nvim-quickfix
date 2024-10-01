@@ -1,5 +1,25 @@
 local M = {}
 
+M.types = {
+  error = 'E',
+  warning = 'W',
+  info = 'I',
+  hint = 'H',
+  note = 'N',
+}
+
+local type_keys = {
+  E = 'error',
+  W = 'warning',
+  I = 'info',
+  N = 'note',
+  H = 'hint',
+}
+
+M.setup = function(opts)
+  M.types = vim.tbl_extend('force', M.types, opts.types)
+end
+
 local fname_len_default = 96
 
 local function format_fname(fname, len)
@@ -15,7 +35,13 @@ local function format_fname(fname, len)
 end
 
 local function format_text(type, text)
-  return (type and type:sub(1, 1):upper() .. ' ' or '') .. text
+  if type then
+    local key = type_keys[type:upper()] or type
+    type = M.types[key] or type
+
+    return ('%s %s'):format(type, text)
+  end
+  return text
 end
 
 local function format_pos(lnum, lnum_len, col, col_len)
@@ -70,7 +96,6 @@ function M.format(info)
 
   for _, e in ipairs(items) do
     if e.valid == 1 then
-      -- print(e.bufnr, buf_fname(e.bufnr))
       e.fname = buf_fname(e.bufnr)
       e.lnum = e.lnum > 99999 and -1 or e.lnum
       e.col = e.col > 999 and -1 or e.col
