@@ -36,11 +36,11 @@ local function buf_fname(bufnr)
       return '[No Name]'
     end
 
-    local home = escape(vim.env.HOME .. '/')
-    local pwd = escape(vim.fn.getcwd(0):gsub('^' .. home, '~/'))
+    local homeExpr = '^' .. escape(vim.env.HOME .. '/')
+    local pwdExpr = '^' .. escape((vim.fn.getcwd(0) .. '/'):gsub(homeExpr, '~/'))
 
-    fname, _ = fname:gsub('^' .. home, '~/')
-    fname, _ = fname:gsub('^' .. pwd, '')
+    fname, _ = fname:gsub(homeExpr, '~/')
+    fname, _ = fname:gsub(pwdExpr, '')
     fname, _ = fname:gsub('^%./', '')
 
     return fname
@@ -70,6 +70,7 @@ function M.format(info)
 
   for _, e in ipairs(items) do
     if e.valid == 1 then
+      -- print(e.bufnr, buf_fname(e.bufnr))
       e.fname = buf_fname(e.bufnr)
       e.lnum = e.lnum > 99999 and -1 or e.lnum
       e.col = e.col > 999 and -1 or e.col
