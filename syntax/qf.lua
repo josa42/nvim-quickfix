@@ -1,4 +1,6 @@
-local types = require('quickfix').types
+local types = vim.tbl_map(function(type)
+  return vim.fn.escape(type, '\\/.*$^~[]')
+end, require('quickfix').types)
 
 vim.cmd.syntax('match', 'qfFileName', '/^[^│]*/', 'nextgroup=qfSeparatorLeft')
 vim.cmd.syntax('match', 'qfSeparatorLeft', '/│/', 'contained nextgroup=qfLineNr')
@@ -7,7 +9,7 @@ vim.cmd.syntax('match', 'qfSeparatorRight', '/│/', 'contained nextgroup=qfErro
 vim.cmd.syntax('match', 'qfError', '/ ' .. types.error .. ' .*$/', 'contained')
 vim.cmd.syntax('match', 'qfWarning', '/ ' .. types.warning .. ' .*$/', 'contained')
 vim.cmd.syntax('match', 'qfInfo', '/ ' .. types.info .. ' .*$/', 'contained')
-vim.cmd.syntax('match', 'qfHint', '/ [' .. types.note .. types.hint .. '] .*$/', 'contained')
+vim.cmd.syntax('match', 'qfHint', '/ \\(' .. types.note .. '\\|' .. types.hint .. '\\) .*$/', 'contained')
 
 vim.cmd.hi('def', 'link', 'qfFileName', 'Directory')
 vim.cmd.hi('def', 'link', 'qfSeparatorLeft', 'Delimiter')
