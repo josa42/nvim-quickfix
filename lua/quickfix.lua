@@ -17,7 +17,7 @@ local type_keys = {
 }
 
 M.setup = function(opts)
-  M.types = vim.tbl_extend('force', M.types, opts.types)
+  M.types = vim.tbl_extend('force', M.types, (opts or {}).types or {})
 end
 
 local fname_len_default = 96
@@ -31,11 +31,11 @@ local function format_fname(fname, len)
     return vim.fn.strcharpart(fname .. string.rep(' ', len), 0, len)
   end
 
-  return '…' .. fname:sub(1 - len)
+  return '…' .. vim.fn.strcharpart(fname, vim.fn.strchars(fname) - len + 1)
 end
 
 local function format_text(type, text)
-  if type then
+  if type and type ~= '' then
     local key = type_keys[type:upper()] or type
     type = M.types[key] or type
 
@@ -48,13 +48,6 @@ local function format_pos(lnum, lnum_len, col, col_len)
   return ('%' .. lnum_len .. 'd:%-' .. col_len .. 'd'):format(lnum, col)
 end
 
-local function escape(str)
-  str, _ = str:gsub('%-', '%%-')
-  str, _ = str:gsub('%.', '%%.')
-
-  return str
-end
-
 local function buf_fname(bufnr)
   if bufnr > 0 then
     local fname = vim.fn.bufname(bufnr)
@@ -62,12 +55,7 @@ local function buf_fname(bufnr)
       return '[No Name]'
     end
 
-    local homeExpr = '^' .. escape(vim.env.HOME .. '/')
-    local pwdExpr = '^' .. escape((vim.fn.getcwd(0) .. '/'):gsub(homeExpr, '~/'))
-
-    fname, _ = fname:gsub(homeExpr, '~/')
-    fname, _ = fname:gsub(pwdExpr, '')
-    fname, _ = fname:gsub('^%./', '')
+    fname, _ = vim.fn.fnamemodify(fname, ':.:~'):gsub('^%./', '')
 
     return fname
   end
@@ -108,7 +96,8 @@ function M.format(info)
 
   fname_len = math.min(fname_len, fname_len_default)
 
-  for _, e in ipairs(items) do
+  for i = info.start_idx, info.end_idx do
+    local e = items[i]
     if e.valid == 1 then
       e.text = ('%s │ %s │ %s'):format(
         format_fname(e.fname, fname_len),
